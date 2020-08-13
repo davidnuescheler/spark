@@ -1,0 +1,143 @@
+body {
+    font-family: 'adobe-clean', 'Adobe Clean';
+    margin: 0;
+    padding: 0;
+}
+header {
+    height: 64px;
+    display: flex;
+    justify-content: space-between;
+    box-sizing: border-box;
+    margin: 20px;
+}
+
+header .icon {
+    height: 35px;
+    width: 35px;
+    position: relative;
+    top: 0;
+    margin-right: 10px;
+}
+
+header p:first-of-type {
+    display: inline-flex;
+    align-self: center;
+    font-size: 27px;
+    font-weight: 200;
+    margin: 5px;
+    color: #888;
+}
+
+a.text-link:any-link {
+    text-decoration: none;
+    border-radius: 18px;
+    padding: 0px 1.2em;
+    height: 36px;
+    outline: none;
+    text-align: center;
+    line-height: 34px;
+    font-size: 1rem;
+    background-color: #1473e6;
+    font-weight: 500;
+    cursor: pointer;
+    color: #fff;
+    transition: background-color .4s;
+    margin: 10px;
+    display: inline-block;
+}
+
+main {
+    text-align: center;
+}
+
+main img {
+    max-width: 100%;
+}
+
+main .section-wrapper>div {
+    margin: auto; 
+    max-width: 950px;
+    padding: 64px 32px;
+}
+
+main .cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+main .hero {
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,.25);
+}
+
+main .hero h1 {
+    font-size: 2em;
+    font-weight: 900;
+}
+
+main .card {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    margin: 20px;
+    justify-content: flex-end;
+}
+
+main .card {
+    border: 1px solid #ccc;
+}
+
+main .card .link {
+    padding: 16px;
+}
+
+main ol {
+    list-style: none;
+    text-align: left;
+    margin-left: 4em;
+    box-sizing: border-box;
+}
+
+main ol li {
+    margin: 2em 0;
+    display: block;
+    position: relative;
+    counter-increment: licount;
+  }
+
+main ol li::before {
+    background-color: #fcce00;
+    border-radius: 50%;
+    color: #fff;
+    content: counter(licount);
+    font-size: 1.25rem;
+    font-weight: bold;
+    height: 2.25rem;
+    line-height: 2rem;
+    width: 2.25rem;
+    left: -4em;
+    display: inline-block;
+    position: absolute;
+    text-align: center;
+  }
+  
+
+main p {
+    color: #888;
+    font-size: 1.2rem;
+    font-weight: 200;
+    line-height: 1.5em;
+}
+
+@media (min-width:600px) {
+    main>.hero h1 {
+        font-size: 3em;
+    }
+}
+
+@media (min-width:900px) {
+    main>.hero h1 {
+        font-size: 3.5em;
+    }
+}
