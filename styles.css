@@ -70,6 +70,8 @@ main .hero {
     color: white;
     text-shadow: 1px 1px 2px rgba(0,0,0,.25);
     background: transparent linear-gradient(-78deg, #9d1ce3 0%, #d029c9 100%) 0% 0% no-repeat padding-box;
+    background-size: cover;
+    background-position: center center;
 }
 
 main .hero h1 {
