@@ -88,14 +88,17 @@ function wrapSections(element) {
     });
 }
 
-function createTitleSection() {
+function createHeroSection() {
   const $headerImg=document.querySelector('main>div:first-of-type>div>:first-child>img');
   if ($headerImg) {
     const src=$headerImg.getAttribute('src');
-    $wrapper=$headerImg.parentNode.parentNode.parentNode;
+    $wrapper=$headerImg.closest('.section-wrapper');
     $wrapper.style.backgroundImage=`url(${src})`;
-    $wrapper.classList.add('hero');
     $headerImg.parentNode.remove();
+  }
+  const $h1=document.querySelector('main>div:first-of-type h1');
+  if ($h1) {
+    $h1.closest('.section-wrapper').classList.add('hero');
   }
 }
 
@@ -118,7 +121,7 @@ function decoratePage() {
     fixIcons();
     decorateTables();
     wrapSections('main>div');
-    createTitleSection();
+    createHeroSection();
     addClassToTextLinks();
     decorateListItems();
 }
