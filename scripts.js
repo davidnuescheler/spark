@@ -42,7 +42,7 @@ function toClassName(name) {
 }
 
 function decorateTables() {
-    document.querySelectorAll('main div.default>table').forEach(($table) => {
+    document.querySelectorAll('main div>table').forEach(($table) => {
         const $cols=$table.querySelectorAll('thead tr th');
         const cols=Array.from($cols).map((e) => toClassName(e.innerHTML));
         const $rows=$table.querySelectorAll('tbody tr');
