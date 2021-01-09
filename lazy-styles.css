@@ -1,0 +1,52 @@
+@import "/hlx_fonts/pnv6nym.css";
+
+/* below the fold */
+
+
+main .template-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+
+main .template-list > div {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    margin: 20px;
+    justify-content: flex-end;
+    border: 1px solid #ccc;
+}
+
+
+main .list {
+    list-style: none;
+    text-align: left;
+    margin-left: 4em;
+    box-sizing: border-box;
+}
+
+main .list ol li {
+    margin: 2em 0;
+    display: block;
+    position: relative;
+    counter-increment: licount;
+  }
+
+main .list ol li::before {
+    background-color: #fcce00;
+    border-radius: 50%;
+    color: #fff;
+    content: counter(licount);
+    font-size: 1.25rem;
+    font-weight: bold;
+    height: 2.25rem;
+    line-height: 2rem;
+    width: 2.25rem;
+    left: -4em;
+    display: inline-block;
+    position: absolute;
+    text-align: center;
+  }
+

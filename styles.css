@@ -19,7 +19,7 @@ header .icon {
     margin-right: 10px;
 }
 
-header p:first-of-type {
+header .logo {
     display: inline-flex;
     align-self: center;
     font-size: 27px;
@@ -28,7 +28,7 @@ header p:first-of-type {
     color: #888;
 }
 
-a.text-link:any-link {
+a.button:any-link {
     text-decoration: none;
     border-radius: 18px;
     padding: 0px 1.2em;
@@ -60,18 +60,10 @@ main .section-wrapper>div {
     padding: 64px 32px;
 }
 
-main .cards {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
 main .hero {
     color: white;
     text-shadow: 1px 1px 2px rgba(0,0,0,.25);
-    background: transparent linear-gradient(-78deg, #9d1ce3 0%, #d029c9 100%) 0% 0% no-repeat padding-box;
-    background-size: cover;
-    background-position: center center;
+    position: relative;
 }
 
 main .hero h1 {
@@ -79,58 +71,20 @@ main .hero h1 {
     font-weight: 900;
 }
 
-main .card {
-    display: flex;
-    flex-direction: column;
-    width: 250px;
-    margin: 20px;
-    justify-content: flex-end;
-}
-
-main .card {
-    border: 1px solid #ccc;
-}
-
-main .card .link {
-    padding: 16px;
-}
-
-main ol {
-    list-style: none;
-    text-align: left;
-    margin-left: 4em;
-    box-sizing: border-box;
-}
-
-main ol li {
-    margin: 2em 0;
-    display: block;
-    position: relative;
-    counter-increment: licount;
-  }
-
-main ol li::before {
-    background-color: #fcce00;
-    border-radius: 50%;
-    color: #fff;
-    content: counter(licount);
-    font-size: 1.25rem;
-    font-weight: bold;
-    height: 2.25rem;
-    line-height: 2rem;
-    width: 2.25rem;
-    left: -4em;
-    display: inline-block;
+main .hero .hero-bg {
     position: absolute;
-    text-align: center;
-  }
-  
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    box-sizing: border-box;
+    z-index: -1;
+}
 
-main p {
-    color: #888;
-    font-size: 1.2rem;
-    font-weight: 200;
-    line-height: 1.5em;
+main .hero .hero-bg img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
 }
 
 @media (min-width:600px) {

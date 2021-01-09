@@ -1,135 +1,150 @@
-/**
- * Creates a tag with the given name and attributes.
- * @param {string} name The tag name
- * @param {object} attrs An object containing the attributes
- * @returns The new tag
- */
-function createTag(name, attrs) {
-    const el = document.createElement(name);
-    if (typeof attrs === 'object') {
-      for (let [key, value] of Object.entries(attrs)) {
-        el.setAttribute(key, value);
-      }
-    }
-    return el;
-  }
-
-
-/**
- * Fixes helix icon functionality until 
- * https://github.com/adobe/helix-pipeline/issues/509
- * is resolved.
- */
-
-function fixIcons() {
-  document.querySelectorAll("use").forEach ((e) => {
-      var a=e.getAttribute("href");
-      if (a.startsWith('/icons/')) {
-        var name=a.split("/")[2].split(".")[0];
-        if (name.startsWith('i-')) {
-          e.setAttribute("href", `/icons.svg#${name.substr(2)}`);  
-          e.parentNode.setAttribute("class", `icon icon-${name.substr(2)}`);  
-        } else {
-          const $img=createTag('img', { class: `icon icon-${name}`, src: a});
-          e.parentNode.parentNode.replaceChild($img, e.parentNode);
-        }
-      }
-  });
-}
-
 function toClassName(name) {
   return (name.toLowerCase().replace(/[^0-9a-z]/gi, '-'))
 }
 
-function decorateTables() {
-    document.querySelectorAll('main div>table').forEach(($table) => {
-        const $cols=$table.querySelectorAll('thead tr th');
-        const cols=Array.from($cols).map((e) => toClassName(e.innerHTML));
-        const $rows=$table.querySelectorAll('tbody tr');
-        let $div={};
 
-        if (cols.length==1 && $rows.length==1) {
-            $div=createTag('div', {class:`${cols[0]}`});
-            $div.innerHTML=$rows[0].querySelector('td').innerHTML;
-        } else {
-            $div=turnTableSectionIntoCards($table, cols) 
-        }
-        $table.parentNode.replaceChild($div, $table);
-    });
+function createTag(name, attrs) {
+  const el = document.createElement(name);
+  if (typeof attrs === 'object') {
+    for (let [key, value] of Object.entries(attrs)) {
+      el.setAttribute(key, value);
+    }
   }
-
-function turnTableSectionIntoCards($table, cols) {
-    const $rows=$table.querySelectorAll('tbody tr');
-    const $cards=createTag('div', {class:`cards ${cols.join('-')}`})
-    $rows.forEach(($tr) => {
-        const $card=createTag('div', {class:'card'})
-        $tr.querySelectorAll('td').forEach(($td, i) => {
-            const $div=createTag('div', {class: cols[i]});
-            const $a=$td.querySelector('a[href]');
-            if ($a && $a.getAttribute('href').startsWith('https://www.youtube.com/')) {
-                const yturl=new URL($a.getAttribute('href'));
-                const vid=yturl.searchParams.get('v');
-                $div.innerHTML=`<div style="left: 0; width: 100%; height: 0; position: relative; padding-bottom: 56.25%;"><iframe src="https://www.youtube.com/embed/${vid}?rel=0" style="border: 0; top: 0; left: 0; width: 100%; height: 100%; position: absolute;" allowfullscreen scrolling="no" allow="encrypted-media; accelerometer; gyroscope; picture-in-picture"></iframe></div>`;
-            } else {
-                $div.innerHTML=$td.innerHTML;
-            }
-            $card.append($div);
-        });
-        $cards.append($card);
-    });
-    return ($cards);
-  }
+  return el;
+}  
 
 function wrapSections(element) {
-    document.querySelectorAll(element).forEach(($div) => {
-        const $wrapper=createTag('div', { class: 'section-wrapper'});
-        $div.parentNode.appendChild($wrapper);
-        $wrapper.appendChild($div);
+  document.querySelectorAll(element).forEach(($div) => {
+      if (!$div.id) {
+          const $wrapper=createTag('div', { class: 'section-wrapper'});
+          $div.parentNode.appendChild($wrapper);
+          $wrapper.appendChild($div);    
+      }
+  });
+}
+
+function decorateTables() {
+  document.querySelectorAll('main div>table').forEach(($table) => {
+    const $cols=$table.querySelectorAll('thead tr th');
+    const cols=Array.from($cols).map((e) => toClassName(e.innerHTML)).filter(e => e?true:false);
+    const $rows=$table.querySelectorAll('tbody tr');
+    let $div={};
+    
+    $div=tableToDivs($table, cols) 
+    $table.parentNode.replaceChild($div, $table);
+  });
+}
+  
+function tableToDivs($table, cols) {
+  const $rows=$table.querySelectorAll('tbody tr');
+  const $cards=createTag('div', {class:`${cols.join('-')} block`})
+  $rows.forEach(($tr) => {
+    const $card=createTag('div')
+    $tr.querySelectorAll('td').forEach(($td, i) => {
+      const $div=createTag('div', cols.length>1?{class: cols[i]}:{});
+        $div.innerHTML=$td.innerHTML;
+        $div.childNodes.forEach(($child) => {
+          if ($child.nodeName=='#text') {
+            const $p=createTag('p');
+            $p.innerHTML=$child.nodeValue;
+            $child.parentElement.replaceChild($p, $child);
+          }
+        })
+        $card.append($div);
+      });
+      $cards.append($card);
     });
+  return ($cards);
+}  
+
+function addDivClasses($element, selector, classes) {
+  const $children=$element.querySelectorAll(selector);
+  $children.forEach(($div, i) => {
+      $div.classList.add(classes[i]);
+  })
 }
 
-function createHeroSection() {
-  const $headerImg=document.querySelector('main>div:first-of-type>div>:first-child>img');
-  if ($headerImg) {
-    const src=$headerImg.getAttribute('src');
-    $wrapper=$headerImg.closest('.section-wrapper');
-    $wrapper.style.backgroundImage=`url(${src})`;
-    $headerImg.parentNode.remove();
+function decorateHeader() {
+  const $header=document.querySelector('header');
+  const classes=['logo', 'susi'];
+  addDivClasses($header, ':scope>p', classes);
+  $header.querySelector('.susi a').classList.add('button');
+}
+
+function decoratePictures() {
+  if (!document.querySelector('picture')) {
+      const helixImages=document.querySelectorAll('main img[src^="/hlx_"');
+      helixImages.forEach($img => {
+          const $pic=createTag('picture');
+          const $parent=$img.parentNode;
+          $pic.appendChild($img);
+          $parent.appendChild($pic);
+      })
   }
-  const $h1=document.querySelector('main>div:first-of-type h1');
+}
+
+function decorateBlocks() {
+  document.querySelectorAll('div.block').forEach(($block) => {
+      const $section=$block.closest('.section-wrapper');
+      if ($section) {
+          const classes=Array.from($block.classList.values());
+          $section.classList.add(classes[0]+'-container');
+      }
+  });
+}
+
+/**
+ * Loads a CSS file.
+ * @param {string} href The path to the CSS file
+ */
+function loadCSS(href) {
+  const link = document.createElement('link');
+  link.setAttribute('rel', 'stylesheet');
+  link.setAttribute('href', href);
+  link.onload = () => {
+  }
+  link.onerror = () => {
+  }
+  document.head.appendChild(link);
+};
+
+function decorateHero() {
+  const $h1=document.querySelector('main h1');
   if ($h1) {
-    $h1.closest('.section-wrapper').classList.add('hero');
+    const $heroSection=$h1.closest('.section-wrapper');
+    $heroSection.classList.add('hero');
+    const $heroImage=$heroSection.querySelector('picture');
+    if ($heroImage) {
+      $heroImage.classList.add('hero-bg');
+    }
   }
 }
 
-function addClassToTextLinks() {
-  document.querySelectorAll('a').forEach(($a) => {
-    if (!$a.firstElementChild || $a.firstElementChild.tagName!='IMG') {
-      $a.classList.add('text-link');
-    }
-  });
-}
-
-function decorateListItems() {
-  document.querySelectorAll('li').forEach(($li) => {
-    const splits=$li.innerHTML.split('<br>');
-    $li.innerHTML=`<h3>${splits[0]}</h3><p>${splits[1]}</p>`;
-  });
+function decorateButtons() {
+  document.querySelectorAll('main a').forEach($a => {
+      const $up=$a.parentElement;
+      const $twoup=$a.parentElement.parentElement;
+      if ($up.childNodes.length==1 && $up.tagName=='P') {
+      $a.className='button secondary';
+      }
+      if ($up.childNodes.length==1 && $up.tagName=='STRONG' && 
+      $twoup.childNodes.length==1 && $twoup.tagName=='P') {
+      $a.className='button primary';
+      }
+  })
 }
 
 function decoratePage() {
-    fixIcons();
+    decoratePictures();
     decorateTables();
     wrapSections('main>div');
-    createHeroSection();
-    addClassToTextLinks();
-    decorateListItems();
+    decorateHeader();
+    decorateHero();
+    decorateBlocks();
+    decorateButtons();
+    wrapSections('footer>div');
+    loadCSS('/lazy-styles.css');
+
 }
 
-if (document.readyState == 'loading') {
-    window.addEventListener('DOMContentLoaded', (event) => {
-        decoratePage();
-    });
-} else {
-    decoratePage();
-}
+decoratePage();
