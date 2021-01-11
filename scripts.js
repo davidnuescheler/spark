@@ -26,10 +26,11 @@ function wrapSections(element) {
 function decorateTables() {
   document.querySelectorAll('main div>table').forEach(($table) => {
     const $cols=$table.querySelectorAll('thead tr th');
-    const cols=Array.from($cols).map((e) => toClassName(e.innerHTML)).filter(e => e?true:false);
+    let cols=Array.from($cols).map((e) => toClassName(e.innerHTML)).filter(e => e?true:false);
     const $rows=$table.querySelectorAll('tbody tr');
     let $div={};
-    
+    /* workaround for import */
+    if (cols.length==0) cols=['template-list'];
     $div=tableToDivs($table, cols) 
     $table.parentNode.replaceChild($div, $table);
   });
@@ -110,13 +111,55 @@ function loadCSS(href) {
 
 function decorateHero() {
   const $h1=document.querySelector('main h1');
+  const $heroImage=$h1.parentElement.querySelector('picture');
+  let $heroSection;
+
   if ($h1) {
-    const $heroSection=$h1.closest('.section-wrapper');
-    $heroSection.classList.add('hero');
-    const $heroImage=$heroSection.querySelector('picture');
-    if ($heroImage) {
-      $heroImage.classList.add('hero-bg');
+    const $main=document.querySelector('main');
+    if ($main.children.length==1) {
+      $heroSection=createTag('div', {class: 'section-wrapper hero'});
+      const $div=createTag('div');
+      $heroSection.append($div);
+      if ($heroImage) {
+        $div.append($heroImage);
+      }
+      $div.append($h1);
+      $main.prepend($heroSection);
+    } else {
+      $heroSection=$h1.closest('.section-wrapper');
+      $heroSection.classList.add('hero');
     }
+  }
+  if ($heroImage) {
+    $heroImage.classList.add('hero-bg');
+  } else {
+    $heroSection.classList.add('hero-noimage');
+  }
+
+}
+
+async function decorateExamplePages() {
+  const usp=new URLSearchParams(window.location.search);
+  const path=usp.get('urls');
+  const $examplePages=document.getElementById('example-pages');
+  if (path && $examplePages) {
+    const $div=$examplePages.parentElement;
+    const resp=await fetch(path);
+    const json=await resp.json();
+    const list=json.data;
+    list.sort((e1,e2) => {
+      return(e1.pathname.localeCompare(e2.pathname));
+    });
+    
+    const $ol=createTag('ol');
+
+    list.forEach((le) =>  {
+      const $li=createTag('li');
+      const pathname=le.pathname.split('.')[0];
+      $li.innerHTML=`<a target="_blank" class="button" href="${pathname}">${pathname}</a>`;
+      $ol.append($li)
+    });
+    $div.append($ol);
   }
 }
 
@@ -143,6 +186,7 @@ function decoratePage() {
     decorateBlocks();
     decorateButtons();
     wrapSections('footer>div');
+    decorateExamplePages();
     loadCSS('/lazy-styles.css');
 
 }
