@@ -177,6 +177,35 @@ function decorateButtons() {
   })
 }
 
+async function loadLazyFooter() {
+  const resp=await fetch('/lazy-footer.plain.html');
+  const inner=await resp.text();
+  const $footer=document.querySelector('footer');
+  $footer.innerHTML=inner;
+  $footer.querySelectorAll('a').forEach(($a) => {
+    const url=new URL($a.href);
+    if (url.hostname == 'spark.adobe.com') {
+      const slash=url.pathname.endsWith('/')?1:0;
+      $a.href=url.pathname.substr(0,url.pathname.length-slash);
+    }
+  })
+  wrapSections('footer>div');
+  addDivClasses($footer, 'footer > div', ['dark','grey','grey']);
+  const $div=createTag('div', {class: 'hidden'});
+  const $dark=document.querySelector('footer .dark>div');
+  
+  Array.from($dark.children).forEach(($e, i) => {
+    if (i) $div.append($e);
+  })
+
+  $dark.append($div);
+
+  $dark.addEventListener('click', (evt) => {
+    $div.classList.toggle('hidden');
+  })
+
+}
+
 function decoratePage() {
     decoratePictures();
     decorateTables();
@@ -185,10 +214,9 @@ function decoratePage() {
     decorateHero();
     decorateBlocks();
     decorateButtons();
-    wrapSections('footer>div');
     decorateExamplePages();
     loadCSS('/lazy-styles.css');
-
+    loadLazyFooter();
 }
 
 decoratePage();
