@@ -5,9 +5,10 @@ indices:
     source: html
     fetch: https://{repo}-{owner}.project-helix.page/{path}
     include:
-      - **/*.(md|docx)
+      - '**/*.(md|docx)'
     exclude:
       - '**/Document.*'
+    target: https://adobe.sharepoint.com/:x:/r/sites/SparkHelix/Shared%20Documents/website/query-index.xlsx?d=w894f33df61b343bf94859b3ec87ed012&csf=1&web=1&e=xY8TrV
     properties:
       author:
         select: main > div:nth-of-type(1) > p:nth-of-type(2)
