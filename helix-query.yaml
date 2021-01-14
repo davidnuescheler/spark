@@ -5,7 +5,7 @@ indices:
     source: html
     fetch: https://{repo}-{owner}.project-helix.page/{path}
     include:
-      - website/**/*.(md|docx)
+      - **/*.(md|docx)
     exclude:
       - '**/Document.*'
     properties:
