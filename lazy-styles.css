@@ -61,6 +61,29 @@ main .list ol li::before {
     text-align: left;
   }
 
+/* blog page */
+
+.blog-page main .section-wrapper:not(.hero) {
+    text-align: left;
+}
+
+.blog-page main > .section-wrapper:not(.hero) > div {
+    background-color: white;
+    max-width: 900px;
+}
+
+.blog-page main > .section-wrapper:not(.hero) {
+    background-color: #ddd;
+}
+
+.blog-page main h2 {
+    font-size: 2.4rem;
+}
+
+.blog-page main h3 {
+    font-size: 1.8rem;
+}
+
   footer div.grey {
     color: #82919b;
     background-color: #35414c;

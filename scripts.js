@@ -167,12 +167,14 @@ function decorateButtons() {
   document.querySelectorAll('main a').forEach($a => {
       const $up=$a.parentElement;
       const $twoup=$a.parentElement.parentElement;
-      if ($up.childNodes.length==1 && $up.tagName=='P') {
-      $a.className='button secondary';
-      }
-      if ($up.childNodes.length==1 && $up.tagName=='STRONG' && 
-      $twoup.childNodes.length==1 && $twoup.tagName=='P') {
-      $a.className='button primary';
+      if (!$a.querySelector('img')) {
+        if ($up.childNodes.length==1 && $up.tagName=='P') {
+          $a.className='button secondary';
+          }
+          if ($up.childNodes.length==1 && $up.tagName=='STRONG' && 
+          $twoup.childNodes.length==1 && $twoup.tagName=='P') {
+          $a.className='button primary';
+          }    
       }
   })
 }
@@ -206,6 +208,34 @@ async function loadLazyFooter() {
 
 }
 
+function decorateTemplate() {
+  if (window.location.pathname.includes('/make/')) {
+    document.body.classList.add('make-page');
+  }
+  const year=window.location.pathname.match(/\/20\d\d\//);
+  if (year) {
+    document.body.classList.add('blog-page');
+  }
+}
+
+function decorateBlogPage() {
+  if (document.body.classList.contains('blog-page')) {
+    const $sections=document.querySelectorAll('main>div.section-wrapper>div');
+    const $body=$sections[1];
+    let $by;
+    let $postedOn;
+    $body.querySelectorAll('p').forEach($p => {
+      if (!$by && $p.textContent.toLowerCase().startsWith('by ')) $by=$p;
+      if (!$postedOn && $p.textContent.toLowerCase().startsWith('posted on ')) $postedOn=$p;
+    })
+    const by=$by.textContent.substring(3);
+    const posted=$postedOn.textContent.substring(10).split('-');
+    var months= ["January","February","March","April","May","June","July",
+    "August","September","October","November","December"];
+    $by.innerHTML=`<span class="byline"><img src="/icons/user.svg"> ${by} | ${months[+posted[0]-1]} ${posted[1]}, ${posted[2]} </span>`;
+    $postedOn.remove();
+  }
+}
 function decoratePage() {
     decoratePictures();
     decorateTables();
@@ -213,10 +243,12 @@ function decoratePage() {
     decorateHeader();
     decorateHero();
     decorateBlocks();
+    decorateTemplate();
     decorateButtons();
     decorateExamplePages();
     loadCSS('/lazy-styles.css');
     loadLazyFooter();
+    decorateBlogPage();
 }
 
 decoratePage();
