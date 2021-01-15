@@ -249,6 +249,52 @@ function decorateBlogPage() {
     $postedOn.remove();
   }
 }
+
+function decorateHowTo() {
+  const $head=document.head;
+  document.querySelectorAll('main .how-to-steps').forEach(($howto) => {
+    const $heading=$howto.previousElementSibling;
+    const $rows=Array.from($howto.children);
+    const $schema=createTag('script', {type: 'application/ld+json'});
+    let schema={
+      "@context":"http://schema.org",
+      "@type":"HowTo",
+      "name": $heading.textContent ,"step":[]
+    };
+
+    $rows.forEach(($row, i)=> {
+      const $cells=Array.from($row.children);
+      const $number=createTag('div', {class: 'number'});
+      $number.innerHTML='<span>'+(i+1)+'</span>';
+      $row.prepend($number);
+      schema.step.push( {
+        "@type":"HowToStep",
+        "position":i+1,
+        "name": $cells[0].textContent,
+        "itemListElement":{
+          "@type":"HowToDirection",
+          "text":$cells[1].textContent
+        }
+      })
+      const $h3=createTag('h3');
+      $h3.innerHTML=$cells[0].textContent;
+      $cells[1].prepend($h3);
+      $cells[1].classList.add('tip');
+      $cells[0].remove();
+    })
+    $schema.innerHTML=JSON.stringify(schema);
+    $head.append($schema);
+  })
+
+
+/*
+<script type="application/ld+json">
+    {"@context":"http://schema.org","@type":"HowTo","name":"How to make a billboard","step":[{"@type":"HowToStep","position":1,"name":"Start with inspiration","itemListElement":{"@type":"HowToDirection","text":"<p>We hook you up with thousands of professionally designed templates so you’re never starting from a blank canvas. Search by platform, task, aesthetic, mood, or color to have fresh inspiration at your fingertips. Once you find a graphic to start from, just tap or click to open the document in the editor.</p>"}},{"@type":"HowToStep","position":2,"name":"Remix it to make it your own","itemListElement":{"@type":"HowToDirection","text":"<p>There are lots of ways to personalize your billboard templates. Change up the copy and font. Sub out the imagery with your own photos. Or browse from thousands of free images right in Spark. Spend as little or as much time as you want making the graphic your own. With a premium plan, you can even auto-apply your brand logo, colors, and fonts so you’re always #onbrand.</p>"}},{"@type":"HowToStep","position":3,"name":"Amp up the flair","itemListElement":{"@type":"HowToDirection","text":"<p>It’s easy to add extra flair and personality to your projects with Spark’s exclusive design assets. Add animated stickers from GIPHY or apply a text animation for short-form graphic videos in one tap. We’ve taken care of all the boring technical stuff, so you can focus on your message and style. You can also add collaborators to your project, so you can have more hands on deck bringing your design to life.</p>"}},{"@type":"HowToStep","position":4,"name":"Resize to make your content go further","itemListElement":{"@type":"HowToDirection","text":"<p>Gone are the days of having to memorize image dimensions for every single platform. Once you’ve landed on a design you like, you can easily modify it for any printed need or social network by using Spark’s handy, auto-magical resize feature. Simply duplicate the project, hit resize, and select the platform you want to adapt it for and our AI will take care of the rest. Boom! Content for all your channels in a fraction of the time!</p>"}},{"@type":"HowToStep","position":5,"name":"Save and share your custom billboard","itemListElement":{"@type":"HowToDirection","text":"<p>Once your billboard is complete, hit that publish button! Instantly download your design to share with your billboard advertiser or professional printer. Upload your design to your social channels to share with all your followers. Adobe Spark saves your designs, so you can always revisit your project if you need to update it in the future.</p>"}}]}
+</script></head>
+*/
+
+}
+
 function decoratePage() {
     decoratePictures();
     decorateTables();
@@ -258,6 +304,7 @@ function decoratePage() {
     decorateBlocks();
     decorateTemplate();
     decorateButtons();
+    decorateHowTo();
     decorateExamplePages();
     decorateBlogPage();
 }
