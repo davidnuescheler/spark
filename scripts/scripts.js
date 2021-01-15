@@ -265,7 +265,7 @@ function decoratePage() {
 function postLCP() {
   loadCSS('/styles/lazy-styles.css');
   loadLazyFooter();
-  loadScript('/scripts/martech.js');
+  if (window.location.search=='?martech') loadScript('/scripts/martech.js');
   
 }
 
