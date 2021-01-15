@@ -109,9 +109,16 @@ function loadCSS(href) {
   document.head.appendChild(link);
 };
 
+function loadScript(url) {
+  const $head=document.querySelector('head');
+  const $script=createTag('script', {src: url});
+  $head.append($script);
+}
+
+
 function decorateHero() {
   const $h1=document.querySelector('main h1');
-  const $heroImage=$h1.parentElement.querySelector('picture');
+  const $heroPicture=$h1.parentElement.querySelector('picture');
   let $heroSection;
 
   if ($h1) {
@@ -120,8 +127,8 @@ function decorateHero() {
       $heroSection=createTag('div', {class: 'section-wrapper hero'});
       const $div=createTag('div');
       $heroSection.append($div);
-      if ($heroImage) {
-        $div.append($heroImage);
+      if ($heroPicture) {
+        $div.append($heroPicture);
       }
       $div.append($h1);
       $main.prepend($heroSection);
@@ -130,10 +137,16 @@ function decorateHero() {
       $heroSection.classList.add('hero');
     }
   }
-  if ($heroImage) {
-    $heroImage.classList.add('hero-bg');
+  if ($heroPicture) {
+    $heroPicture.classList.add('hero-bg');
+    const $heroImage=$heroPicture.querySelector('img');
+    console.log($heroImage);
+    $heroImage.addEventListener('load', () => {
+      postLCP();
+    })
   } else {
     $heroSection.classList.add('hero-noimage');
+    postLCP();
   }
 
 }
@@ -246,9 +259,14 @@ function decoratePage() {
     decorateTemplate();
     decorateButtons();
     decorateExamplePages();
-    loadCSS('/lazy-styles.css');
-    loadLazyFooter();
     decorateBlogPage();
+}
+
+function postLCP() {
+  loadCSS('/styles/lazy-styles.css');
+  loadLazyFooter();
+  loadScript('/scripts/martech.js');
+  
 }
 
 decoratePage();
