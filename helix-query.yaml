@@ -1,14 +1,51 @@
 version: 1
 
 indices:
+  blog:
+    source: html
+    fetch: https://{repo}-{owner}.project-helix.page/{path}
+    include:
+      - '20[1-3][0-9]/[01][0-9]/[0-3][0-9]/*.(docx|md)'
+    exclude:
+      - '**/Document.*'
+    target: https://adobe.sharepoint.com/:x:/r/sites/SparkHelix/Shared%20Documents/website/blog-index.xlsx?d=w2f1369f931484d648bcc30968d83cded&csf=1&web=1&e=fg63wS
+    properties:
+      author:
+        select: main > div:nth-of-type(1) > p:nth-of-type(2)
+        value: |
+          match(el, '[bB]y (.*)')
+      title:
+        select: head > meta[property="og:title"]
+        value: |
+          attribute(el, 'content')
+      date:
+        select: main > div:nth-of-type(1) > p:nth-of-type(3)
+        value: |
+          parseTimestamp(el, '[Posted on] MM-DD-YYYY')
+      image:
+        select: head > meta[property="og:image"]
+        value: |
+          match(attribute(el, 'content'), 'https:\/\/[^/]+(\/.*)')
+      teaser:
+        select: main > div:nth-of-type(1) > p:nth-of-type(4)
+        value: |
+          words(textContent(el), 0, 20)
+      sourceHash:
+        select: head > meta[name=x-source-hash
+        value: |
+          attribute(el, 'content')
+      external-path:
+        select: head > meta[property="og:url"]
+        value: |
+          match(attribute(el, 'content'), 'https:\/\/[^/]+(\/.*)')
   website:
     source: html
     fetch: https://{repo}-{owner}.project-helix.page/{path}
     include:
-      - '**/*.(md|docx)'
+      - '(make|templates)/**/*.(docx|md)'
     exclude:
       - '**/Document.*'
-    target: https://adobe.sharepoint.com/:x:/r/sites/SparkHelix/Shared%20Documents/website/query-index.xlsx?d=w894f33df61b343bf94859b3ec87ed012&csf=1&web=1&e=xY8TrV
+    target: https://adobe.sharepoint.com/:x:/r/sites/SparkHelix/Shared%20Documents/website/query-index.xlsx?d=w894f33df61b343bf94859b3ec87ed012&csf=1&web=1&e=JJcnUD
     properties:
       author:
         select: main > div:nth-of-type(1) > p:nth-of-type(2)
