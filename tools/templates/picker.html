@@ -62,8 +62,7 @@
       }
 
       .offscreen {
-        position: absolute;
-        top: -1000px;
+        display: none;
       }
 
     </style>
@@ -71,11 +70,11 @@
       let nbSelected = 0;
       const templateSelection = {};
 
-      const find = async () => {
-        const res = await fetch('https://spark-search.adobe.io/v2/content', { 
+      const find = async (q) => {
+        const res = await fetch(`https://spark-search.adobe.io/v2/content?q=${q}`, { 
           headers: { 
             'x-api-key': 'Helix_Spark_Content_Search'
-          }
+          },
         });
 
         const json = await res.json();
@@ -83,7 +82,8 @@
       }
 
       const search = async () => {
-        const array = await find();
+        const q = document.getElementById('search');
+        const array = await find(q.value || '');
         if (array) {
           const resultContainer = document.querySelector('#results');
           resultContainer.innerHTML = '';
