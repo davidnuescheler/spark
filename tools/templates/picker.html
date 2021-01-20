@@ -48,12 +48,44 @@
 
       #results .template {
         user-select: none;
-        max-width: 150px;
+
         margin: 10px;
+
+        max-width: 240px;
+        width: 240px; 
+        max-height: 240px;
+        height: 240px;
+        min-height: 240px;
+
+        align-self: flex-end;
+        background-color: #dce0e3;
+        margin: 15px 8px 65px 16px;
+        position: relative;
+      }
+
+      #results .template .thumbnail-container {
+        height: 100%;
+        position: relative;
+        width: 100%;
       }
 
       #results .template img {
-        max-width: 120px;
+        background: #dce0e3 center center/contain no-repeat;
+        height: 100%;
+        object-fit: contain;
+        width: 100%;
+        float: left;
+      }
+
+      #results .template .title {
+        background-color: #fff;
+        border: solid 1px #dce0e3;
+        padding: 10px;
+
+        text-align: left;
+        font-weight: 400;
+        font-size: 13px;
+        text-decoration: none;
       }
 
       #results .selected {
@@ -101,9 +133,12 @@
             const template = document.createElement('div');
             template.classList.add('template');
 
-            template.innerHTML += `<img src="${href}">
+            template.innerHTML += `
+              <div class="thumbnail-container">
+                <img src="${href}">
+              </div>
               <a href="${t.branchURL}">
-                <span class="title">${t.title}</span>
+                <div class="title">${t.title}</div>
               </a>`;
 
             template.addEventListener('click', () => {
