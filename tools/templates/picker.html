@@ -71,7 +71,12 @@
       const templateSelection = {};
 
       const find = async (q) => {
-        const res = await fetch(`https://spark-search.adobe.io/v2/content?q=${q}`, { 
+        const params = {
+          q,
+          filters: 'branchURL:*',
+        }
+        const urlParams = new URLSearchParams(Object.entries(params));
+        const res = await fetch(`https://spark-search.adobe.io/v2/content?${urlParams}`, { 
           headers: { 
             'x-api-key': 'Helix_Spark_Content_Search'
           },
@@ -91,7 +96,7 @@
             const href = t.rendition.href
               .replace('\{format\}', 'jpg')
               .replace('\{dimension\}', 'width')
-              .replace('\{size\}', '1200');
+              .replace('\{size\}', t.rendition.maxWidth || 1200);
 
             const template = document.createElement('div');
             template.classList.add('template');
