@@ -1,0 +1,217 @@
+<html>
+  <head>
+    <title>Spark - Template picker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+      body {
+        font-family: 'Adobe Clean';
+      }
+
+      main {
+        padding: 20px;
+        font-size: 1.3rem;
+        line-height: 1.2em;
+      }
+
+      main select {
+        font-size: 1rem;
+        border: none;
+        border-bottom: solid 1px grey;
+        padding-top: 5px;
+      }
+    
+      main input {
+        width: 50%;
+        font-size: 2rem;
+        border: none;
+        border-bottom: solid 1px grey;
+        padding-top: 5px;
+      }
+
+      main .filter {
+        padding: 20px 10px 20px 10px;
+      }
+
+      main button {
+        border-radius: 1em;
+        padding: 5px 20px;
+        font-size: 1.5rem;
+      }
+
+
+      #results {
+        display: flex;
+        flex-wrap: wrap;
+        padding-bottom: 150px;
+      }
+
+      #results .template {
+        user-select: none;
+        max-width: 150px;
+        margin: 10px;
+      }
+
+      #results .template img {
+        max-width: 120px;
+      }
+
+      #results .selected {
+        opacity: 0.5;
+        background-color: lightgrey;
+      }
+
+      .offscreen {
+        /* position: absolute;
+        top: -1000px; */
+      }
+
+    </style>
+    <script>
+      let nbSelected = 0;
+      const templateSelection = {};
+
+      const find = async () => {
+        const res = await fetch('https://spark-search.adobe.io/v2/content', { 
+          headers: { 
+            'x-api-key': 'Helix_Spark_Content_Search'
+          }
+        });
+
+        const json = await res.json();
+        return json._embedded && json._embedded.results ? json._embedded.results : [];
+      }
+
+      const search = async () => {
+        const array = await find();
+        if (array) {
+          const resultContainer = document.querySelector('#results');
+          resultContainer.innerHTML = '';
+          array.forEach(t => {
+            const href = t.rendition.href
+              .replace('\{format\}', 'jpg')
+              .replace('\{dimension\}', 'width')
+              .replace('\{size\}', '1200');
+
+            const template = document.createElement('div');
+            template.classList.add('template');
+
+            template.innerHTML += `<img src="${href}">
+              <a href="${t.branchURL}">
+                <span class="title">${t.title}</span>
+              </a>`;
+
+            template.addEventListener('click', () => {
+              if (template.classList.contains('selected')) {
+                template.classList.remove('selected');
+                delete templateSelection[t.branchURL];
+                nbSelected--;
+              } else {
+                template.classList.add('selected');
+                templateSelection[t.branchURL] = {
+                  img: href,
+                  title: t.title,
+                  branchURL: t.branchURL
+                };
+                nbSelected++;
+              }
+
+              const copySelectionButton = document.getElementById('copyselection');
+              if (nbSelected > 0) {
+                copySelectionButton.disabled = false;
+              } else {
+                copySelectionButton.disabled = true;
+              }
+            });
+
+            resultContainer.append(template);
+          });
+        }        
+      }
+
+      const insert = (template) => {
+        const tbody = document.querySelector('#copybuffer tbody');
+        
+        const row = document.createElement('tr');
+        tbody.append(row);
+
+        const imgCell = document.createElement('td');
+        imgCell.style.border = '1px solid black';
+
+        row.append(imgCell);
+        const img = document.createElement('img');
+        img.src = template.img;
+        img.alt = template.title;
+        img.style.width = '250pt';
+        img.width = '250';
+        img.style.display = 'block';
+
+        imgCell.append(img);
+
+        const linkCell = document.createElement('td');
+        linkCell.style.border = '1px solid black';
+        row.append(linkCell);
+        const link = document.createElement('a');
+        link.href = template.branchURL;
+        link.innerHTML = 'Edit this template';
+        linkCell.append(link);
+      }
+
+      const copyHTMLToClipboard = (html) => {
+        const callback = (e) => {
+          e.clipboardData.setData('text/html', html);
+          e.clipboardData.setData('text/plain', html);
+          e.preventDefault();
+        };
+
+        document.addEventListener('copy', callback);
+        document.execCommand('copy');
+        document.removeEventListener('copy', callback);
+      };
+
+      const clear = () => {
+        const tbody = document.querySelector('#copybuffer tbody');
+        tbody.innerHTML = '';
+      }
+
+      const copy = () => {
+
+        clear();
+
+        for(let p in templateSelection) {
+          insert(templateSelection[p]);
+        }
+
+        const div = document.getElementById('copybuffer');
+        copyHTMLToClipboard(div.innerHTML);
+      }
+    </script>
+  </head>
+  <body>
+    <main>
+      <h1>Pick your templates</h1>
+      <div class="filter">
+        <input autocomplete="off" placeholder="Type to search" id="search">
+        <button type="button" onclick="search()">Search</button>
+        <button type="button" onclick="copy()" id="copyselection" disabled="true">Copy Selection</button>
+      </div>
+      <div id="results"></div>
+    </main>
+    <div class="offscreen" id="copybuffer">
+      <table cellpadding="0" cellspacing="0" style="border: 1px solid black; border-spacing: 0;">
+        <thead>
+            <tr>
+              <th style="border: 1px solid black;" colspan="2">Template List</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    
+    <script>
+      window.addEventListener('DOMContentLoaded', async (event) => {
+        
+      });
+    </script>
+  </body>
+</html>
