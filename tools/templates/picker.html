@@ -97,8 +97,61 @@
         background-color: lightgrey;
       }
 
-      .offscreen {
+      .hidden {
         display: none;
+      }
+
+      #selectionPanel {
+        position: fixed;
+        bottom: 0;
+        background-color: lightsalmon;
+        padding-bottom: 20px;
+        width: 100%;
+        box-sizing: border-box;
+        left: 0;
+        user-select: none;
+      }
+
+      #selectionPanel button:disabled {
+        background-color: #ccc;
+        color: grey;
+      }
+
+      #selectionPanel button {
+        background-color: #F25749;
+        color: white;
+        position: absolute;
+        right: 10px;
+        bottom: 50px;
+        border: 1px solid white;
+        font-size: 13px;
+      }
+
+
+      #selectionPanel #selectedList {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #selectionPanel .selectedTemplate {
+        user-select: none;
+        margin: 10px;
+        max-width: 100px;
+        width: 100x;
+        max-height: 100px;
+        height: 100px;
+        min-height: 100px;
+        align-self: flex-end;
+        background-color: #dce0e3;
+        position: relative;
+      }
+
+      #selectionPanel .selectedTemplate img {
+        background: #dce0e3 center center/contain no-repeat;
+        height: 100%;
+        object-fit: contain;
+        width: 100%;
+        float: left;
       }
 
     </style>
@@ -122,6 +175,48 @@
         return json._embedded && json._embedded.results ? json._embedded.results : [];
       }
 
+      const unselect = (id) => {
+        delete templateSelection[id];
+        nbSelected--;
+
+        const elem = document.querySelector(`#results [data-id="${id}"]`);
+        if (elem) {
+          elem.classList.remove('selected');
+        }
+        drawSelection();
+      }
+
+      const select = (id, template) => {
+        templateSelection[id] = template;
+        nbSelected++;
+
+        const elem = document.querySelector(`#results [data-id="${id}"]`);
+        if (elem) {
+          elem.classList.add('selected');
+        }
+        drawSelection();
+      }
+
+      const drawSelection = () => {
+        const selectedList = document.getElementById('selectedList');
+        let html = '';
+        for(let p in templateSelection) {
+          const t = templateSelection[p];
+          html += `<div class="selectedTemplate" onclick="unselect('${t.branchURL}')">
+              <img src="${t.img}">
+            </div>`;
+        };
+
+        const selectionPanel = document.getElementById('selectionPanel');
+        if (html === '') {
+          selectionPanel.classList.add('hidden');
+          selectedList.innerHTML = html;
+        } else {
+          selectedList.innerHTML = html;
+          selectionPanel.classList.remove('hidden');
+        }
+      }
+
       const search = async () => {
         const q = document.getElementById('search');
         const array = await find(q.value || '');
@@ -136,28 +231,25 @@
 
             const template = document.createElement('div');
             template.classList.add('template');
+            template.setAttribute('data-id', t.branchURL);
 
             template.innerHTML += `
               <div class="thumbnail-container">
                 <img src="${href}">
               </div>
-              <a href="${t.branchURL}">
+              <a href="${t.branchURL}" target="_blank">
                 <div class="title">${t.title}</div>
               </a>`;
 
             template.addEventListener('click', () => {
               if (template.classList.contains('selected')) {
-                template.classList.remove('selected');
-                delete templateSelection[t.branchURL];
-                nbSelected--;
+                unselect(t.branchURL);
               } else {
-                template.classList.add('selected');
-                templateSelection[t.branchURL] = {
+                select(t.branchURL, {
                   img: href,
                   title: t.title,
                   branchURL: t.branchURL
-                };
-                nbSelected++;
+                });
               }
 
               const copySelectionButton = document.getElementById('copyselection');
@@ -237,11 +329,14 @@
       <div class="filter">
         <input autocomplete="off" placeholder="Type to search" id="search">
         <button type="button" onclick="search()">Search</button>
-        <button type="button" onclick="copy()" id="copyselection" disabled="true">Copy Selection</button>
       </div>
       <div id="results"></div>
+      <div id="selectionPanel" class="hidden">
+        <div id="selectedList"></div>
+        <button type="button" onclick="copy()" id="copyselection" disabled="true">Copy Selection</button>
+      </div>
     </main>
-    <div class="offscreen" id="copybuffer">
+    <div class="hidden" id="copybuffer">
       <table cellpadding="0" cellspacing="0" style="border: 1px solid black; border-spacing: 0;">
         <thead>
             <tr>
