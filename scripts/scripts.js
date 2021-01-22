@@ -109,10 +109,11 @@ function loadCSS(href) {
   document.head.appendChild(link);
 };
 
-function loadScript(url) {
+function loadScript(url,callback) {
   const $head=document.querySelector('head');
   const $script=createTag('script', {src: url});
   $head.append($script);
+  $script.onload=callback;
 }
 
 
@@ -334,6 +335,87 @@ function decorateABTests() {
       console.log(`Test is not run => ${reason}`);
   }
 }
+async function fetchBlogIndex() {
+  const resp=await fetch('/blog-index.json');
+  const json=await resp.json();
+  return (json.data);
+}
+
+async function filterBlogPosts(locale, filters) {
+  if (!window.blogIndex) {
+      window.blogIndex=await fetchBlogIndex();
+  }
+  const index=window.blogIndex;
+
+  const f={};
+  for (let name in filters) {
+      const vals=filters[name];
+      let v=vals;
+      if (!Array.isArray(vals)) {
+          v=[vals];
+      }
+      console.log(v);
+      f[name]=v.map(e => e.toLowerCase().trim());
+  }
+
+  console.log(f);
+
+  const result=index.filter((post) => {
+    let matchedAll=true;
+      for (let name in f) {
+          let matched=false;
+          f[name].forEach((val) => {
+              if (post[name].toLowerCase().includes(val)) {
+                  matched=true;
+              }
+          });
+          if (!matched) {
+            matchedAll=false;
+            break;
+          }
+      }
+      return (matchedAll);
+  });
+
+  return (result);
+}
+
+function readBlockConfig($block) {
+  const config={};
+  $block.querySelectorAll(':scope>div').forEach(($row) => {
+    if ($row.children && $row.children[1]) {
+      const name=toClassName($row.children[0].textContent);
+      const $a=$row.children[1].querySelector('a');
+      let value='';
+      if ($a) value=$a.href;
+      else value=$row.children[1].textContent;
+      config[name]=value;  
+    }
+  });
+  return config;
+}
+
+function decorateBlogPosts() {
+  document.querySelectorAll('main .blog-posts').forEach( async ($blogPosts, i) => {
+    const config=readBlockConfig($blogPosts);
+    const posts=await filterBlogPosts('en-US', config);
+    $blogPosts.innerHTML='';
+    posts.forEach((post) => {
+      const $card=createTag('div', {class: 'card' });
+      $card.innerHTML=`<div class="card-image">
+        <img loading="lazy" src="${post.image}">
+      </div>
+      <div class="card-body">
+        <h3>${post.title}</h3>
+        <p>${post.teaser}</p>
+      </div>`;
+      $card.addEventListener('click', (evt) => {
+        window.location.href='/'+post.path;
+      })
+      $blogPosts.appendChild($card);
+    })
+  })
+}
 
 function decoratePage() {
     decoratePictures();
@@ -354,7 +436,7 @@ function postLCP() {
   loadCSS('/styles/lazy-styles.css');
   loadLazyFooter();
   if (window.location.search=='?martech') loadScript('/scripts/martech.js');
-  
+  decorateBlogPosts();
 }
 
 decoratePage();
