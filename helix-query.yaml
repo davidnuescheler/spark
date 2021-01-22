@@ -38,6 +38,11 @@ indices:
         select: head > meta[property="og:url"]
         value: |
           match(attribute(el, 'content'), 'https:\/\/[^/]+(\/.*)')
+      tags:
+        select: main > div:nth-of-type(1) > p:last-of-type
+        values: |
+          match(el, '(Tags: )? ([^,]+)')
+
   website:
     source: html
     fetch: https://{repo}-{owner}.project-helix.page/{path}
