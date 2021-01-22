@@ -248,6 +248,7 @@ function decorateBlogPage() {
     "August","September","October","November","December"];
     $by.innerHTML=`<span class="byline"><img src="/icons/user.svg"> ${by} | ${months[+posted[0]-1]} ${posted[1]}, ${posted[2]} </span>`;
     $postedOn.remove();
+    decorateLegacyLinks();
   }
 }
 
@@ -358,8 +359,6 @@ async function filterBlogPosts(locale, filters) {
       f[name]=v.map(e => e.toLowerCase().trim());
   }
 
-  console.log(f);
-
   const result=index.filter((post) => {
     let matchedAll=true;
       for (let name in f) {
@@ -417,6 +416,59 @@ function decorateBlogPosts() {
   })
 }
 
+function decorateAnimations() {
+  document.querySelectorAll('.animation a[href], .video a[href]').forEach(($a) => {
+    let href=$a.getAttribute('href');
+    const url=new URL(href);
+    const helixId=url.pathname.split('/')[2];
+    const $parent=$a.parentNode;
+
+    if (href.endsWith('.mp4')) {
+      //const isAnimation=$a.closest('.animation')?true:false;
+      const isAnimation=true;
+
+      let attribs={controls:''};
+      if (isAnimation) {
+        attribs={playsinline:'', autoplay:'', loop:'', muted:''};
+      }
+      const $poster=$a.closest('div').querySelector('img');
+      if ($poster) {
+        attribs.poster=$poster.src;
+        $poster.remove();
+      }
+
+      const $video=createTag('video', attribs);
+      /*
+      if (href.startsWith('https://hlx.blob.core.windows.net/external/')) {
+        href='/hlx_'+href.split('/')[4].replace('#image','');
+      }
+      */
+      $video.innerHTML=`<source src="${href}" type="video/mp4">`;
+      $a.parentNode.replaceChild($video, $a);
+      if (isAnimation) {
+          $video.addEventListener('canplay', (evt) => { 
+            $video.muted=true;
+            $video.play() });
+      }
+    }
+    
+    if (href.endsWith('.gif')) {
+      $a.parentNode.replaceChild(createTag('img',{src: `/hlx_${helixId}.gif`}), $a);  
+    }
+
+    const $next=$parent.nextElementSibling;
+    if ($next && $next.tagName=='P' && $next.innerHTML.trim().startsWith('<em>')) $next.classList.add('legend');
+  });
+}
+
+function decorateLegacyLinks() {
+  const legacy='https://blog.adobespark.com/';
+  document.querySelectorAll(`a[href^="${legacy}"]`).forEach(($a) => {
+    console.log($a);
+    $a.href=$a.href.substring(0, $a.href.length-1).substring(legacy.length-1);
+  })
+}
+
 function decoratePage() {
     decoratePictures();
     decorateABTests();
@@ -433,6 +485,7 @@ function decoratePage() {
 }
 
 function postLCP() {
+  decorateAnimations();
   loadCSS('/styles/lazy-styles.css');
   loadLazyFooter();
   if (window.location.search=='?martech') loadScript('/scripts/martech.js');

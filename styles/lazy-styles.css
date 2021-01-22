@@ -103,6 +103,10 @@ main .blog-posts {
   justify-content: center;
 }
 
+main video {
+  max-width: 100%;
+}
+
 main .blog-posts .card {
   display: flex;
   flex-direction: column;
