@@ -321,13 +321,20 @@
         const div = document.getElementById('copybuffer');
         copyHTMLToClipboard(div.innerHTML);
       }
+
+      const searchOnReturn = (event) => {
+        if (event.keyCode === 13) {
+          event.preventDefault();
+          search();
+        }
+      }
     </script>
   </head>
   <body>
     <main>
       <h1>Pick your templates</h1>
       <div class="filter">
-        <input autocomplete="off" placeholder="Type to search" id="search">
+        <input autocomplete="off" placeholder="Type to search" id="search" onkeyup="searchOnReturn(event)">
         <button type="button" onclick="search()">Search</button>
       </div>
       <div id="results"></div>
