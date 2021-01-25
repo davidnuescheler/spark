@@ -469,6 +469,151 @@ function decorateLegacyLinks() {
   })
 }
 
+function displayTutorial(tutorial){
+  console.log(tutorial.link);
+}
+
+function createTutorialCard(tutorial) {
+  const $card=createTag('div', {class: 'tutorial-card'});
+  let img;
+  if (tutorial.img) 
+    {
+    img=`<img src="${tutorial.img}">`;
+  } else {
+    img=`<span>${tutorial.title}</span>`;  
+  }
+
+  $card.innerHTML=`<div class="tutorial-card-image">
+  </div>
+  <div class="tutorial-card-img">
+    ${img}
+  </div>
+  <div class="tutorial-card-title">
+  <h3>${tutorial.title}</h3>
+  </div>
+  <div class="tutorial-card-tags">
+  <span>${tutorial.tags.join('</span><span>')}</span>
+  </div>
+  `;
+  $card.addEventListener('click', displayTutorial(tutorial))
+  return ($card);
+}
+
+function displayTutorialsByCatgory (tutorials, $results, category) {
+  $results.innerHTML='';
+  
+  const matches=tutorials.filter((tut) => tut.categories.includes(category));
+  matches.forEach((match) => {
+    $results.appendChild(createTutorialCard(match));
+  })
+}
+
+function toggleCategories($section, show) {
+  const children=Array.from($section.children);
+  let afterTutorials=false;
+  children.forEach(($e) => {
+    console.log($e);
+    if (afterTutorials) {
+      if (show) {
+        $e.classList.remove('hidden');
+      } else {
+        $e.classList.add('hidden');
+      } 
+    }
+    if ($e.classList.contains('tutorials')) {
+      afterTutorials=true;
+    }
+  })
+}
+
+function displayFilteredTutorials (tutorials, $results, $filters) {
+  $results.innerHTML='';
+  const $section=$results.closest('.section-wrapper > div');
+  console.log($section);
+  const filters=(Array.from($filters)).map(f => f.textContent);
+  if (filters.length) {
+    toggleCategories($section, false);
+    const matches=tutorials.filter((tut) => filters.every(v => tut.tags.includes(v)));
+    matches.forEach((match) => {
+      $results.appendChild(createTutorialCard(match));
+    })
+  } else {
+    toggleCategories($section, true);
+  }
+}
+
+function decorateTutorials() {
+  document.querySelectorAll('main .tutorials').forEach(($tutorials) => {
+    const tutorials=[];
+    const $section=$tutorials.closest(`.section-wrapper > div`);
+    const allTags=[];
+    const $rows=Array.from($tutorials.children);
+    $rows.forEach(($row, i) => {
+      console.log(i);
+      const $cells=Array.from($row.children);
+      const $tags=$cells[3];
+      const $categories=$cells[2];
+      const $title=$cells[0];
+      const $img=$cells[4];
+
+      const tags=Array.from($tags.children).map($tag => $tag.textContent);
+      const categories=Array.from($categories.children).map($cat => $cat.textContent);
+      const time=$cells[1].textContent;
+      const title=$title.textContent;
+      const link=$title.querySelector('a').href;
+      const img=$img.querySelector('img')?$img.querySelector('img').src:undefined;
+
+      tutorials.push({title, link, time, tags, categories, img});
+
+      tags.forEach((tag)=>{
+        if (!allTags.includes(tag)) allTags.push(tag);
+      })
+
+    })
+    
+    $tutorials.innerHTML='';
+    const $results=createTag('div', {class: 'results'});
+    $tutorials.appendChild($results);
+
+    const $filters=createTag('div', {class: 'filters'});
+    allTags.forEach((tag) => {
+      const $tagFilter=createTag('span', {class: 'tag-filter'});
+      $tagFilter.innerHTML=tag;
+      $filters.appendChild($tagFilter);
+      $tagFilter.addEventListener('click', (evt) => {
+        $tagFilter.classList.toggle('selected');
+        displayFilteredTutorials(tutorials, $results, $filters.querySelectorAll('.selected'));
+      })
+    })
+
+    $tutorials.prepend($filters);
+
+    const $children=Array.from($section.children);
+    let filterFor='';
+    $children.forEach(($e) => {
+      console.log($e.tagName);
+      if ($e.tagName=='H2') {
+        if (filterFor) {
+          const $results=createTag('div', {class: 'results'});
+          displayTutorialsByCatgory(tutorials, $results, filterFor);
+          $section.insertBefore($results, $e)
+        }
+        filterFor=$e.textContent;
+      }
+    });
+
+    if (filterFor) {
+      const $results=createTag('div', {class: 'results'});
+      displayTutorialsByCatgory(tutorials, $results, filterFor);
+      $section.appendChild($results);
+    }
+
+
+    console.log(allTags);
+    console.log(tutorials);
+  });
+}
+
 function decoratePage() {
     decoratePictures();
     decorateABTests();
@@ -482,6 +627,7 @@ function decoratePage() {
     decorateHowTo();
     decorateExamplePages();
     decorateBlogPage();
+    decorateTutorials();
 }
 
 function postLCP() {

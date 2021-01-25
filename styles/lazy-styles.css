@@ -103,6 +103,46 @@ main .blog-posts {
   justify-content: center;
 }
 
+main .tutorials .filters .tag-filter {
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  padding: 5px 20px;
+  margin: 5px;
+  display: inline-block;
+}
+
+main .tutorials .filters .tag-filter.selected {
+  background-color: #1473e6;
+  color: white;
+  font-weight: 700;
+}
+
+main .tutorials-container .results {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+} 
+
+main .tutorials-container .results.hidden {
+  display: none;
+}
+
+main .tutorials-container .results .tutorial-card {
+  width: 275px;
+  display: flex;
+  flex-direction: column;
+  margin: 20px
+}
+
+main .tutorials-container .results .tutorial-card-tags span {
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  color: lightgray;
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 5px;
+}
+
 main video {
   max-width: 100%;
 }
