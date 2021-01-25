@@ -312,7 +312,7 @@
         const url = new URL(window.location.href);
         const modulePath = url.searchParams.get('picker');
 
-        if (modulePath.indexOf('/') === 0) {
+        if (modulePath && modulePath.indexOf('/') === 0) {
           // only allow to load same host js file
           try {
             picker = (await import(modulePath)).default;
