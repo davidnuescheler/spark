@@ -469,24 +469,81 @@ function decorateLegacyLinks() {
   })
 }
 
+function playYouTubeVideo(vid, $element) {
+
+  $element.innerHTML=`<iframe width="720" height="405" src="https://www.youtube.com/embed/${vid}?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  
+  /*
+  const ytPlayerScript='https://www.youtube.com/iframe_api';
+  if (!document.querySelector(`script[src="${ytPlayerScript}"]`)) {
+    const tag = document.createElement('script');
+    tag.src = ytPlayerScript;
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  }
+
+  if (typeof YT !== 'undefined' && YT.Player) {
+    const player = new YT.Player($element.id, {
+      height: $element.clientHeight,
+      width: $element.clientWidth,
+      videoId: vid,
+      events: {
+          'onReady': (event) => {
+            event.target.playVideo();
+          },
+        }
+    });
+  } else {
+    setTimeout(() => {
+      playYouTubeVideo(vid, $element);
+    }, 100)
+  }
+  */
+}
+
 function displayTutorial(tutorial){
+  if (tutorial.link.includes('youtu')) {
+    const $overlay=createTag('div', {class: 'overlay'});
+    const $video=createTag('div', {class: 'overlay-video', id: 'overlay-video'});
+    $overlay.appendChild($video);
+    window.location.hash=toClassName(tutorial.title);
+    const $main=document.querySelector('main');
+    $main.append($overlay);
+    const yturl=new URL(tutorial.link);
+    let vid=yturl.searchParams.get('v');
+    if (!vid) {
+      vid=yturl.pathname.substr(1);
+    }
+    $overlay.addEventListener('click', (evt) => {
+      window.location.hash='';
+      $overlay.remove();
+    });
+
+    playYouTubeVideo(vid, $video);
+  } else {
+    window.location.href=tutorial.link;
+  }
+
   console.log(tutorial.link);
 }
 
 function createTutorialCard(tutorial) {
   const $card=createTag('div', {class: 'tutorial-card'});
   let img;
+  let noimg='';
   if (tutorial.img) 
     {
     img=`<img src="${tutorial.img}">`;
   } else {
-    img=`<span>${tutorial.title}</span>`;  
+    img=`<div class="badge"></div><div class="title">${tutorial.title}</div>`;  
+    noimg='noimg';
   }
-
+  
   $card.innerHTML=`<div class="tutorial-card-image">
   </div>
-  <div class="tutorial-card-img">
+  <div class="tutorial-card-img ${noimg}">
     ${img}
+    <div class="duration">${tutorial.time}</div>
   </div>
   <div class="tutorial-card-title">
   <h3>${tutorial.title}</h3>
@@ -495,7 +552,8 @@ function createTutorialCard(tutorial) {
   <span>${tutorial.tags.join('</span><span>')}</span>
   </div>
   `;
-  $card.addEventListener('click', displayTutorial(tutorial))
+  $card.addEventListener('click', () => {
+    displayTutorial(tutorial) })
   return ($card);
 }
 
@@ -608,9 +666,16 @@ function decorateTutorials() {
       $section.appendChild($results);
     }
 
+    if (window.location.hash!='#') {
+      const video=window.location.hash.substr(1);
+      tutorials.forEach((tutorial) => {
+        if (toClassName(tutorial.title) == video) {
+          displayTutorial(tutorial);
+        }
+      })
+    }
 
-    console.log(allTags);
-    console.log(tutorials);
+
   });
 }
 
