@@ -160,11 +160,11 @@ async function fetchFullIndex(indices) {
     if (url) {
       const resp=await fetch(url);
       const json=await resp.json();
-      console.log (json.data.length);
+      console.log (`${url}: ${json.data.length}`);
+      json.data.sort((e1, e2) => e1.path.localeCompare(e2.path));
       fullIndex.push(...json.data);  
     }
   }
-  fullIndex.sort((e1, e2) => e1.path.localeCompare(e2.path));
   return (fullIndex);
 }
 
