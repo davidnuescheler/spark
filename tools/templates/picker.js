@@ -44,7 +44,7 @@ export default {
      * @param {*} id Id of the copy buffer dom element
      */
     init(id) {
-      document.getElementById(id).innerHTML = `<table cellpadding="0" cellspacing="0" style="border: 1px solid black; border-spacing: 0;">
+      document.getElementById(id).innerHTML = `<table cellpadding="0" cellspacing="0" style="border: 1px solid black; border-spacing: 0; width: 100%">
         <thead>
             <tr>
               <th style="border: 1px solid black; background-color: rgb(211, 211, 211);" colspan="2">Template List</th>
@@ -72,9 +72,7 @@ export default {
       const img = document.createElement('img');
       img.src = item.img;
       img.alt = item.title;
-      img.style.width = '250pt';
       img.width = '250';
-      img.style.display = 'block';
 
       imgCell.append(img);
 
