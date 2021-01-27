@@ -278,9 +278,7 @@
         const img = document.createElement('img');
         img.src = template.img;
         img.alt = template.title;
-        img.style.width = '250pt';
         img.width = '250';
-        img.style.display = 'block';
 
         imgCell.append(img);
 
@@ -344,7 +342,7 @@
       </div>
     </main>
     <div class="hidden" id="copybuffer">
-      <table cellpadding="0" cellspacing="0" style="border: 1px solid black; border-spacing: 0;">
+      <table cellpadding="0" cellspacing="0" style="border: 1px solid black; border-spacing: 0; width: 100%">
         <thead>
             <tr>
               <th style="border: 1px solid black; background-color: rgb(211, 211, 211);" colspan="2">Template List</th>
