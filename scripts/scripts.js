@@ -219,7 +219,7 @@ async function decorateMigratedPages() {
 
     window.fullIndex=await fetchFullIndex(indices);
   
-    filterMigratedPages('');
+    filterMigratedPages($pageFilter.value);
       
   }
 
