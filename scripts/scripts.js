@@ -180,17 +180,18 @@ function filterMigratedPages(filter) {
         counter++;
         let path=page.path;
         if (!path.startsWith('/')) path='/'+path;
-        if (filter) path=path.split(filter).join(`<b>${filter}</b>`)
+        let markedUpPath=path;
+        if (filter) markedUpPath=path.split(filter).join(`<b>${filter}</b>`)
         const $card=createTag('div', {class: 'card' });
         $card.innerHTML=`<div class="card-image">
           <img loading="lazy" src="${page.image}">
         </div>
         <div class="card-body">
           <h3>${page.title}</h3>
-          <p>${path}</p>
+          <p>${markedUpPath}</p>
         </div>`;
         $card.addEventListener('click', (evt) => {
-          window.location.href='/'+page.path;
+          window.location.href=path;
         })
         $results.appendChild($card);
       }
