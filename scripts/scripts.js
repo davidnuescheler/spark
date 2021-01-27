@@ -142,9 +142,14 @@ function decorateHero() {
     $heroPicture.classList.add('hero-bg');
     const $heroImage=$heroPicture.querySelector('img');
     console.log($heroImage);
-    $heroImage.addEventListener('load', () => {
+
+    if ($heroImage.complete) {
       postLCP();
-    })
+    } else {
+      $heroImage.addEventListener('load', () => {
+        postLCP();
+      })  
+    }
   } else {
     $heroSection.classList.add('hero-noimage');
     postLCP();
