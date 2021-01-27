@@ -83,6 +83,8 @@ export default {
       link.href = item.link;
       link.innerHTML = 'Edit this template';
       linkCell.append(link);
+
+      img.height = (250 / img.naturalWidth) * img.naturalHeight;
     },
 
     /**
