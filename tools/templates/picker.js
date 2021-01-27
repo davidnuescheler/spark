@@ -1,3 +1,5 @@
+const IMG_EXPORT_WIDTH = 180;
+
 export default {
 
   /**
@@ -67,24 +69,28 @@ export default {
 
       const imgCell = document.createElement('td');
       imgCell.style.border = '1px solid black';
+      imgCell.style.textAlign = 'center';
+      imgCell.style.verticalAlign = 'middle';
 
       row.append(imgCell);
       const img = document.createElement('img');
       img.src = item.img;
       img.alt = item.title;
-      img.width = '250';
+      img.width = IMG_EXPORT_WIDTH;
 
       imgCell.append(img);
 
       const linkCell = document.createElement('td');
       linkCell.style.border = '1px solid black';
+      linkCell.style.textAlign = 'left';
+      linkCell.style.verticalAlign = 'middle';
       row.append(linkCell);
       const link = document.createElement('a');
       link.href = item.link;
       link.innerHTML = 'Edit this template';
       linkCell.append(link);
 
-      img.height = (250 / img.naturalWidth) * img.naturalHeight;
+      img.height = (IMG_EXPORT_WIDTH / img.naturalWidth) * img.naturalHeight;
     },
 
     /**
