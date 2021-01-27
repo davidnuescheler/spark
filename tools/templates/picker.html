@@ -265,6 +265,8 @@
         }        
       }
 
+      const IMG_EXPORT_WIDTH = 180;
+
       const insert = (template) => {
         const tbody = document.querySelector('#copybuffer tbody');
         
@@ -273,24 +275,28 @@
 
         const imgCell = document.createElement('td');
         imgCell.style.border = '1px solid black';
+        imgCell.style.textAlign = 'center';
+        imgCell.style.verticalAlign = 'middle';
 
         row.append(imgCell);
         const img = document.createElement('img');
         img.src = template.img;
         img.alt = template.title;
-        img.style.width = '250pt';
-        img.width = '250';
-        img.style.display = 'block';
+        img.width = IMG_EXPORT_WIDTH;
 
         imgCell.append(img);
 
         const linkCell = document.createElement('td');
         linkCell.style.border = '1px solid black';
+        linkCell.style.textAlign = 'left';
+        linkCell.style.verticalAlign = 'middle';
         row.append(linkCell);
         const link = document.createElement('a');
         link.href = template.branchURL;
         link.innerHTML = 'Edit this template';
         linkCell.append(link);
+
+        img.height = (IMG_EXPORT_WIDTH / img.naturalWidth) * img.naturalHeight;
       }
 
       const copyHTMLToClipboard = (html) => {
@@ -344,7 +350,7 @@
       </div>
     </main>
     <div class="hidden" id="copybuffer">
-      <table cellpadding="0" cellspacing="0" style="border: 1px solid black; border-spacing: 0;">
+      <table cellpadding="0" cellspacing="0" style="border: 1px solid black; border-spacing: 0; width: 100%">
         <thead>
             <tr>
               <th style="border: 1px solid black; background-color: rgb(211, 211, 211);" colspan="2">Template List</th>
