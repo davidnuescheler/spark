@@ -152,29 +152,77 @@ function decorateHero() {
 
 }
 
-async function decorateExamplePages() {
-  const usp=new URLSearchParams(window.location.search);
-  const path=usp.get('urls');
-  const $examplePages=document.getElementById('example-pages');
-  if (path && $examplePages) {
-    const $div=$examplePages.parentElement;
-    const resp=await fetch(path);
-    const json=await resp.json();
-    const list=json.data;
-    list.sort((e1,e2) => {
-      return(e1.pathname.localeCompare(e2.pathname));
-    });
-    
-    const $ol=createTag('ol');
+async function fetchFullIndex(indices) {
+  const fullIndex=[];
 
-    list.forEach((le) =>  {
-      const $li=createTag('li');
-      const pathname=le.pathname.split('.')[0];
-      $li.innerHTML=`<a target="_blank" class="button" href="${pathname}">${pathname}</a>`;
-      $ol.append($li)
-    });
-    $div.append($ol);
+  for (let i=0;i<indices.length;i++) {
+    const url=indices[i];
+    if (url) {
+      const resp=await fetch(url);
+      const json=await resp.json();
+      console.log (json.data.length);
+      fullIndex.push(...json.data);  
+    }
   }
+  fullIndex.sort((e1, e2) => e1.path.localeCompare(e2.path));
+  return (fullIndex);
+}
+
+function filterMigratedPages(filter) {
+  const $results=document.getElementById('page-filter-results');
+  const $stats=document.getElementById('page-filter-stats');
+  $results.innerHTML='';
+  const index=window.fullIndex;
+  let counter=0;
+  if (index) {
+    index.forEach((page) => {
+      if (page.path.includes(filter)) {
+        counter++;
+        let path=page.path;
+        if (!path.startsWith('/')) path='/'+path;
+        let markedUpPath=path;
+        if (filter) markedUpPath=path.split(filter).join(`<b>${filter}</b>`)
+        const $card=createTag('div', {class: 'card' });
+        $card.innerHTML=`<div class="card-image">
+          <img loading="lazy" src="${page.image}">
+        </div>
+        <div class="card-body">
+          <h3>${page.title}</h3>
+          <p>${markedUpPath}</p>
+        </div>`;
+        $card.addEventListener('click', (evt) => {
+          window.location.href=path;
+        })
+        $results.appendChild($card);
+      }
+    })
+  }
+  $stats.innerHTML=`${counter} page${counter!=1?'s':''} found`;
+}
+
+async function decorateMigratedPages() {
+
+  const $filterPages=document.querySelector('main .filter-pages');
+  if ($filterPages) {
+    const config=readBlockConfig($filterPages);
+
+    $filterPages.innerHTML=`<input type="text" id="page-filter" placeholder="type to filter" />
+    <div class="stats" id="page-filter-stats"></div>
+    <div class="results" id="page-filter-results"></div>`;
+
+    const $pageFilter=document.getElementById('page-filter');
+    $pageFilter.addEventListener('keyup', (evt) => {
+      filterMigratedPages($pageFilter.value);
+    });
+
+    const indices=config.indices.split('.json').map(e => e?e+'.json':undefined);
+
+    window.fullIndex=await fetchFullIndex(indices);
+  
+    filterMigratedPages('');
+      
+  }
+
 }
 
 function decorateButtons() {
@@ -690,7 +738,7 @@ function decoratePage() {
     decorateTemplate();
     decorateButtons();
     decorateHowTo();
-    decorateExamplePages();
+    decorateMigratedPages();
     decorateBlogPage();
     decorateTutorials();
 }
