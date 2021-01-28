@@ -7,7 +7,7 @@
 
   sk.add({
     id: 'templates',
-    condition: (sk) => sk.isEditor() && (sk.location.search.includes('.docx&') || sk.location.search.includes('.md&')),
+    condition: (sk) => sk.isEditor() && (sk.location.search.includes('.docx&') || sk.location.search.includes('doc.aspx?') || sk.location.search.includes('.md&')),
     button: {
       text: 'Templates',
       action: () => {
