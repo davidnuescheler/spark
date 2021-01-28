@@ -185,6 +185,7 @@ function filterMigratedPages(filter) {
         counter++;
         let path=page.path;
         if (!path.startsWith('/')) path='/'+path;
+        path=path.replace('.html','');
         let markedUpPath=path;
         if (filter) markedUpPath=path.split(filter).join(`<b>${filter}</b>`)
         const $card=createTag('div', {class: 'card' });
@@ -732,6 +733,35 @@ function decorateTutorials() {
   });
 }
 
+function decorateMetaData() {
+  const $meta=document.querySelector('main .metadata');
+  if ($meta) {
+    const metaconfig=readBlockConfig($meta);
+    const mapping={
+      title: ['og:title','twitter:title'],
+      description: ['og:description', 'twitter:description', 'description']
+    };
+    if (metaconfig.title) document.title=metaconfig.title;
+
+    for (let a in mapping) {
+      if (metaconfig[a]) {
+        mapping[a].forEach(b => {
+          let $elem;
+          if (b.includes(':')) {
+            $elem=document.querySelector(`head meta[property="${b}"]`);
+          } else {
+            $elem=document.querySelector(`head meta[name="${b}"]`);
+          }
+          if ($elem) {
+            $elem.setAttribute('content', metaconfig[a]);
+          }  
+        });
+      }
+    }
+    $meta.remove();
+  }
+}
+
 function decoratePage() {
     decoratePictures();
     decorateABTests();
@@ -746,6 +776,7 @@ function decoratePage() {
     decorateMigratedPages();
     decorateBlogPage();
     decorateTutorials();
+    decorateMetaData();
 }
 
 function postLCP() {
