@@ -12,7 +12,7 @@
       text: 'Templates',
       action: () => {
         const { config, location } = sk;
-        window.open(`https://${config.host || location.innerHost}/tools/templates/picker.html`, 'hlx-sidekick-spark-templates');
+        window.open(`https://${config.host || config.innerHost}/tools/templates/picker.html`, 'hlx-sidekick-spark-templates');
       },
     },
   });
