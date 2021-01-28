@@ -60,6 +60,10 @@ indices:
         select: head > meta[property="og:image"]
         value: |
           match(attribute(el, 'content'), 'https:\/\/[^/]+(\/.*)')
+      sourceHash:
+        select: head > meta[name=x-source-hash
+        value: |
+          attribute(el, 'content')
 
   website: &default
     source: html
