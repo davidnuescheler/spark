@@ -43,6 +43,28 @@ indices:
         values: |
           match(el, '(Tags: )? ([^,]+)')
 
+  authors:
+    source: html
+    fetch: https://{repo}-{owner}.project-helix.page/{path}
+    include:
+      - 'authors/*.(docx|md)'
+    exclude:
+      - '**/Document.*'
+    target: https://adobe.sharepoint.com/:x:/r/sites/SparkHelix/Shared%20Documents/website/blog-index.xlsx?d=w2f1369f931484d648bcc30968d83cded&csf=1&web=1&e=fg63wS#Table2
+    properties:
+      author:
+        select: head > meta[property="og:title"]
+        value: |
+          attribute(el, 'content')
+      image:
+        select: head > meta[property="og:image"]
+        value: |
+          match(attribute(el, 'content'), 'https:\/\/[^/]+(\/.*)')
+      sourceHash:
+        select: head > meta[name=x-source-hash
+        value: |
+          attribute(el, 'content')
+
   website: &default
     source: html
     fetch: https://{repo}-{owner}.project-helix.page/{path}
